@@ -1,3 +1,32 @@
-var prompt = require('prompt-sync')();
+require("dotenv").config();
+const express = require("express");
+const connectToDb = require("./Database/db");
+const path = require("path");
+const Music = require("./model/Music");
 
-console.log("Hello World!")
+const app = express();
+const port = process.env.port || 3000;
+
+app.set("view engine", "ejs");
+app.use(express.static(path.join(__dirname, "Public")));
+app.use(express.urlencoded());
+
+connectToDb();
+
+app.get("/", (req, res) => {
+  res.render("index");
+});
+
+app.get("/admin", (req, res) => {
+  res.render("admin");
+});
+
+app.post("/create", async (req, res) => {
+    const music = req.body;
+    await Music.create(music);
+    res.redirect("/")
+  });
+  
+  app.listen(port, () =>
+    console.log(`Servidor rodando em http://localhost:${port}`)
+  );
